@@ -61,12 +61,13 @@ func (list *ListNode) Print() error {
 	list = list.Next
 	p1 := list
 	p2 := list
-
-	for p1 != nil { //Обход по списку
-
-		var dur time.Duration //Разница между конечным и начальным временем вызова (для всех звонков)
-		var currCost float64  //Разница текущего звонка
-		var cost float64      //Общая стоимость на конец тарифного периода
+	var dur time.Duration //Разница между конечным и начальным временем вызова (для всех звонков)
+	var currCost float64  //Разница текущего звонка
+	var cost float64      //Общая стоимость на конец тарифного периода
+	for p1 != nil {       //Обход по списку
+		dur = 0
+		currCost = 0
+		cost = 0
 
 		currentNumber := p1.number //Текущий номер
 
@@ -87,7 +88,7 @@ func (list *ListNode) Print() error {
 		fmt.Fprintf(file, "| Call Type |   Start Time        |     End Time        | Duration |  Cost  |\n")
 		fmt.Fprintf(file, "----------------------------------------------------------------------------\n")
 
-		for p2 != nil { //
+		for p2 != nil {
 
 			if currentNumber == p2.number {
 				currDuration := p2.date2.Sub(p2.date1)
@@ -98,26 +99,30 @@ func (list *ListNode) Print() error {
 						currCost = 0
 					} else {
 						currCost = float64(time.Duration(currDuration.Minutes()))
-						cost += currCost
+
 					}
 				} else if p2.tariff == "03" {
 					currCost = float64(time.Duration(currDuration.Minutes())) * 1.5
-					cost += currCost
+
 				} else if p2.tariff == "11" {
 					if p2.callType == "02" {
-						cost = 0
-					} else {
+						currCost = 0
+					}
+					if p2.callType == "01" {
 						if dur <= time.Minute*100 {
 							currCost = float64(time.Duration(currDuration.Minutes())) * 0.5
-							cost += currCost
+
 						}
 						if dur > time.Minute*100 {
 							currCost = float64(time.Duration(currDuration.Minutes())) * 1.5
-							cost += currCost
 						}
+
 					}
+
 				}
-				fmt.Fprintf(file, "|    %v    | %v | %v | %8v | %6.2f |\n", p2.callType, p2.date1.Format("2006-01-02 15:04:05"), p2.date2.Format("2006-01-02 15:04:05"), currDuration, currCost)
+				cost += currCost
+
+				fmt.Fprintf(file, "|    %v    | %v | %v | %8v | %7.2f |\n", p2.callType, p2.date1.Format("2006-01-02 15:04:05"), p2.date2.Format("2006-01-02 15:04:05"), currDuration, currCost)
 
 			}
 			p2 = p2.Next // Переход к следующему элементу списка
@@ -155,7 +160,7 @@ func main() {
 	for fileScanner.Scan() { //Построчно сканируем файл
 		var str string
 
-		str = fileScanner.Text()        //Заносим отсканированную строку в переменную str
+		str = fileScanner.Text()         //Заносим отсканированную строку в переменную str
 		vars := strings.Split(str, ", ") //Разбиваем строку на подстроки по разделителю " "
 		//Тип вызова,тариф и номер
 		tp := vars[0]

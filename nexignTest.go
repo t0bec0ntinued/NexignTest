@@ -156,7 +156,7 @@ func main() {
 		var str string
 
 		str = fileScanner.Text()        //Заносим отсканированную строку в переменную str
-		vars := strings.Split(str, " ") //Разбиваем строку на подстроки по разделителю " "
+		vars := strings.Split(str, ", ") //Разбиваем строку на подстроки по разделителю " "
 		//Тип вызова,тариф и номер
 		tp := vars[0]
 		tar := vars[4]
